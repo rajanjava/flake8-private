@@ -22,7 +22,12 @@ def parse_args(
     # XXX (ericvw): Special case "forwarding" the output file option so
     # that it can be reparsed again for the BaseFormatter.filename.
     if args0.output_file:
-        rest.extend(("--output-file", args0.output_file))
+        try:
+            dash_dash_idx = rest.index("--")
+        except ValueError:
+            rest.extend(("--output-file", args0.output_file))
+        else:
+            rest[dash_dash_idx:dash_dash_idx] = ("--output-file", args0.output_file)
 
     flake8.configure_logging(args0.verbose, args0.output_file)
 

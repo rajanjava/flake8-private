@@ -394,3 +394,15 @@ def test_format_option_help(capsys):
     out, err = capsys.readouterr()
     assert "(default, pylint, quiet-filename, quiet-nothing)" in out
     assert err == ""
+
+
+def test_output_file_with_end_of_arguments(tmpdir, capsys):
+    """Ensure --output-file works when combined with -- end-of-arguments marker."""
+    with tmpdir.as_cwd():
+        tmpdir.join("t.py").write("x=1\n")
+        assert cli.main(["--output-file", "output.txt", "--", "t.py"]) == 1
+        out, err = capsys.readouterr()
+        assert out == ""
+        assert err == ""
+        output_content = tmpdir.join("output.txt").read()
+        assert "t.py:1:2: E225 missing whitespace around operator" in output_content

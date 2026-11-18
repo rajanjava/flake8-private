@@ -28,6 +28,11 @@ When users run flake8 passing `--` to indicate the end of options (common in CI 
 
 ---
 
+## Solution Approach
+1. **Trace Double-Dash (`--`) Argument Parsing:** Flake8's custom `parse_args` pre-scans options (like `--output-file`) before delegating to argparse. When `--` (POSIX end-of-options marker) appeared on the command line, options appearing before `--` or filenames after `--` were misaligned, causing `FileNotFoundError`.
+2. **Respect POSIX `--` Delimiter Boundaries:** Updated `src/flake8/options/parse_args.py` to stop option scanning at the `--` delimiter and preserve options before `--` separately from positional file arguments after `--`.
+3. **TDD & Regression Safety:** Added `test_output_file_with_end_of_arguments` in `tests/integration/test_main.py` confirming `--output-file` works cleanly alongside `--`.
+
 ## Solution
 When `"--"` is present in `rest`, insert `("--output-file", args0.output_file)` before the `"--"` marker rather than appending it to the end:
 ```python
